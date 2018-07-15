@@ -1,0 +1,20 @@
+  1.Padding 主要是针对View(ViewGroup也是View)来说的,设置padding View就能解析的到，View在Measure和onDraw(绘制content)时都没有对padding进行处理，
+所以在自定义view是要让view支持padding必须在这两个地方进行支持；对于ViewGroup而言，
+                                                  @attr ref android.R.styleable#ViewGroup_clipChildren
+                                                  @attr ref android.R.styleable#ViewGroup_clipToPadding
+这两个属性值默认为true   case R.styleable.ViewGroup_clipChildren:
+                          setClipChildren(a.getBoolean(attr, true));
+                          break;
+                        case R.styleable.ViewGroup_clipToPadding:
+                            setClipToPadding(a.getBoolean(attr, true));
+                            break;    
+这两个属性是ViewGroup才有的属性，在绘制的时候Canvas会进行padding裁剪后将canvas交给child,而ViewGroup onDraw中一般不绘制内容，所以绘制过程一般不需要
+处理。ViewGoup需要对padding进行处理的是mearsure和layout这两个部分。
+
+  2.Margin 主要实在ViewGroup中进行处理，View中不需要处理，只需要设置相应ViewGroup的margin属性即可，在ViewGroup.LayoutParams没有margin属性，自定义
+  ViewGroup需要让自己的LayoutParams extends MarginLayoutParams，并重写：
+                                                              public LayoutParams generateLayoutParams(AttributeSet attrs) {
+                                                                    return new LayoutParams(getContext(), attrs);
+                                                              }
+返回自己的LayoutParams,同时在Measure和Layout两个阶段处理child的margin即可，自己的margin会由parent处理。                                                              
+                                                              
